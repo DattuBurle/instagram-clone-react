@@ -1,8 +1,22 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
 import Post from './Post';
+import { db } from './firebase';
 
 function App() {
+
+  const [posts, setPosts] = useState([]);
+
+  // useEffect - Runs a piece of code based on a specific condition
+  useEffect(() => {
+    db.collection('posts').onSnapshot(snapshot => {
+      setPosts(snapshot.docs.map(doc => ({
+        id : doc.id,
+        post : doc.data()
+      })));
+    })
+  }, []);
+
   return (
     <div className="App">
       <div className = "app__header">
@@ -13,9 +27,11 @@ function App() {
         />
       </div>
 
-      <Post username = "Dattu Burle" caption = "U r doing great JOB" imageURL ="https://www.andreasreiterer.at/wp-content/uploads/2017/11/react-logo-825x510.jpg.webp"/>
-      <Post username = "Uday Agarwal" caption = "U r doing great JOB" imageURL = "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_960_720.jpg"/>
-      <Post username = "Rishabh Yadhav" caption = "U r doing great JOB" imageURL = "https://www.teahub.io/photos/full/0-1188_beautiful-wallpaper-iphone.jpg"/>
+      {
+        posts.map(({id, post}) => (
+          <Post key = {id} username = {post.username} caption = {post.caption} imageURL = {post.imageURL}/>
+        ))
+      }
 
     </div>
   );
